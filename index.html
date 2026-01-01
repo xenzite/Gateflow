@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canva Pro Team</title>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    <style>
+        :root { --bg-color: #121212; --card-bg: #1e1e1e; --primary-btn: #7b1fa2; --accent: #00e5ff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: white; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { width: 90%; max-width: 400px; background: var(--card-bg); border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); padding-bottom: 20px; text-align: center; }
+        .header { background: linear-gradient(135deg, #6200ea, #00b8d4); padding: 30px 20px; position: relative; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .header p { font-size: 13px; margin-top: 10px; opacity: 0.9; }
+        .steps-container { display: flex; justify-content: space-around; margin: 20px; background: #333; border-radius: 10px; overflow: hidden; }
+        .step { flex: 1; padding: 10px; font-weight: bold; font-size: 14px; color: #888; transition: 0.3s; }
+        .step.active { background: #555; color: white; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        .step.completed { background: #4caf50; color: white; }
+        .btn { display: block; width: 85%; margin: 10px auto; padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; text-decoration: none; transition: 0.3s; }
+        .btn-main { background: var(--primary-btn); color: white; }
+        .btn-secondary { background: #311b92; color: white; }
+        .btn-success { background: #2e7d32; color: white; display: none; }
+        .footer-link { color: #00b8d4; text-decoration: none; font-size: 14px; display: block; margin-top: 20px; }
+        #final-link-box { background: #222; margin: 15px; padding: 15px; border-radius: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1 id="ui-title">Loading...</h1>
+        <p id="ui-subtitle">Complete steps to unlock</p>
+    </div>
+
+    <div class="steps-container">
+        <div id="st1" class="step active">Step 1</div>
+        <div id="st2" class="step">Step 2</div>
+        <div id="st3" class="step">Step 3</div>
+    </div>
+
+    <button id="ad-btn" class="btn btn-main" onclick="handleAdClick()">🔒 Watch Ads to Unlock</button>
+    <button id="unlock-btn" class="btn btn-success" onclick="openFinalLink()">🎉 Click to Open Canva Pro</button>
+
+    <div id="final-link-box">
+        <p style="font-size: 12px;">Copy link and paste in browser:</p>
+        <code id="display-link" style="color: #00e5ff; word-break: break-all;"></code>
+    </div>
+
+    <a id="btn1-link" href="#" class="btn btn-secondary">Join Channel</a>
+    <a id="btn2-link" href="#" class="btn btn-secondary">Premium Apps</a>
+    
+    <a href="#" class="footer-link" id="admin-name">by Alex</a>
+</div>
+
+<!-- Monetag SDK Placeholder -->
+<!-- এখানে আপনার Monetag SDK স্ক্রিপ্ট বসাবেন -->
+<script>
+    // FIREBASE CONFIGURATION (এখানে আপনার ফায়ারবেস কনফিগ বসান)
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "YOUR_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let currentStep = 1;
+    let configData = {};
+
+    // Fetch Data from Firebase
+    db.collection("settings").doc("appConfig").onSnapshot((doc) => {
+        if (doc.exists) {
+            configData = doc.data();
+            updateUI();
+        }
+    });
+
+    function updateUI() {
+        document.getElementById('ui-title').innerText = configData.title || "Canva Pro Team";
+        document.getElementById('ui-subtitle').innerText = configData.subtitle || "Complete 3 Steps";
+        document.getElementById('btn1-link').innerText = configData.btn1Name || "Join Channel";
+        document.getElementById('btn1-link').href = configData.btn1Url || "#";
+        document.getElementById('btn2-link').innerText = configData.btn2Name || "Premium Apps";
+        document.getElementById('btn2-link').href = configData.btn2Url || "#";
+        document.getElementById('admin-name').innerText = "by " + (configData.adminName || "Alex");
+        document.getElementById('display-link').innerText = configData.finalUrl || "";
+    }
+
+    function handleAdClick() {
+        const zoneId = configData.monetagZoneId || "1234567"; // ডামি জোন আইডি
+        
+        // Monetag Ad Trigger Logic
+        alert("Showing Ad from Zone: " + zoneId); // টেস্টের জন্য অ্যালার্ট
+        
+        // এখানে আপনার Monetag অ্যাড শো করার কোড বসবে
+        // উদাহরণ: show_8888888().then(() => { ... logic ... });
+
+        // অ্যাড দেখা শেষ হলে নিচের লজিক কাজ করবে
+        if (currentStep < 3) {
+            document.getElementById(`st${currentStep}`).classList.remove('active');
+            document.getElementById(`st${currentStep}`).classList.add('completed');
+            currentStep++;
+            document.getElementById(`st${currentStep}`).classList.add('active');
+        } else {
+            document.getElementById('st3').classList.add('completed');
+            document.getElementById('ad-btn').style.display = 'none';
+            document.getElementById('unlock-btn').style.display = 'block';
+            document.getElementById('final-link-box').style.display = 'block';
+        }
+    }
+
+    function openFinalLink() {
+        window.open(configData.finalUrl, "_blank");
+    }
+</script>
+</body>
+</html>
